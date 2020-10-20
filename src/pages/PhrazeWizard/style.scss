@@ -1,0 +1,22 @@
+.PhrazeWizard {
+    background-color: #fdfdfc;
+    min-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    &__content {
+        width: 100%;
+        max-width: 960px;
+        background-color: #fff;
+        box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.15);
+        padding: 24px;
+        border-radius: 4px;
+    }
+
+    &__form {
+       input {
+           text-align: center;
+       }
+    }
+}
