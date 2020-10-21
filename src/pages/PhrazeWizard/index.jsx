@@ -31,7 +31,11 @@ function reducer(state = initInputFields, { field, value, payload, type }) {
         result[`phrase_${index}`] = {
           value: '',
           countSym: item.length,
-          phrase: item
+          phrase: item,
+          validate: {
+            isValid: true,
+            help: ''
+          }
         }
       });
 
@@ -41,11 +45,30 @@ function reducer(state = initInputFields, { field, value, payload, type }) {
       }
     }
     case 'change_input': {
+      let validate = {
+        isValid: true,
+        help: ''
+      };
+      
+      for (let i = 0; i < value.length; i += 1) {
+        if (value[i] === '.') {
+          break;
+        }
+        if (value[i] !== state[field].phrase[i]) {
+          validate = {
+            isValid: false,
+            help: 'Error'
+          }
+          break;
+        }
+      };
+
       return {
         ...state,
         [field]: {
           ...state[field],
-          value: value
+          value: value,
+          validate: validate
         }
       }
     }
@@ -55,7 +78,7 @@ function reducer(state = initInputFields, { field, value, payload, type }) {
       }
     }
   }
-}
+};
 
 const PhrazeWizard = () => {
   const [form] = Form.useForm();
@@ -91,9 +114,14 @@ const PhrazeWizard = () => {
               <Row gutter={8} justify='center'>
                 {dataPhrases.map((item, index) => {
                   return <Col span={item.countSym < 6 ? 2 : Math.floor(item.countSym / 3)} key={index}>
-                    <InputMask name={`phrase_${index}`} mask={`${'a'.repeat(item.countSym)}`} value={item.value} onChange={handleInput} maskChar='.'>
-                      {(inputProps) => <Input {...inputProps} placeholder={`${'.'.repeat(item.countSym)}`}/>}
-                    </InputMask>
+                    <Form.Item
+                      validateStatus={item.validate.isValid ? 'success' : 'error'}
+                      help={item.validate.help}
+                    >
+                      <InputMask name={`phrase_${index}`} mask={`${'a'.repeat(item.countSym)}`} value={item.value} onChange={handleInput} maskChar='.'>
+                        {(inputProps) => <Input {...inputProps} placeholder={`${'.'.repeat(item.countSym)}`}/>}
+                      </InputMask>
+                    </Form.Item>
                   </Col>
                 })}
               </Row>
