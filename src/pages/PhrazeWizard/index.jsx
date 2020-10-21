@@ -34,7 +34,8 @@ function reducer(state = initInputFields, { field, value, payload, type }) {
           phrase: item,
           validate: {
             isValid: true,
-            help: ''
+            help: '',
+            fullValid: false
           }
         }
       });
@@ -47,7 +48,8 @@ function reducer(state = initInputFields, { field, value, payload, type }) {
     case 'change_input': {
       let validate = {
         isValid: true,
-        help: ''
+        help: '',
+        fullValid: false
       };
       
       for (let i = 0; i < value.length; i += 1) {
@@ -56,12 +58,25 @@ function reducer(state = initInputFields, { field, value, payload, type }) {
         }
         if (value[i] !== state[field].phrase[i]) {
           validate = {
+            ...validate,
             isValid: false,
             help: 'Error'
           }
           break;
         }
       };
+
+      if (value[value.length - 1] !== '.' && value === state[field].phrase) {
+        validate = {
+          ...validate,
+          fullValid: true
+        }
+      } else {
+        validate = {
+          ...validate,
+          fullValid: false
+        }
+      }
 
       return {
         ...state,
@@ -90,7 +105,6 @@ const PhrazeWizard = () => {
   
 
   const handleInput = (e) => {
-    console.log(e.target.name)
     dispatch({ field: e.target.name, value: e.target.value, type: 'change_input' });
   };
 
@@ -117,6 +131,7 @@ const PhrazeWizard = () => {
                     <Form.Item
                       validateStatus={item.validate.isValid ? 'success' : 'error'}
                       help={item.validate.help}
+                      hasFeedback={item.validate.fullValid}
                     >
                       <InputMask name={`phrase_${index}`} mask={`${'a'.repeat(item.countSym)}`} value={item.value} onChange={handleInput} maskChar='.'>
                         {(inputProps) => <Input {...inputProps} placeholder={`${'.'.repeat(item.countSym)}`}/>}
